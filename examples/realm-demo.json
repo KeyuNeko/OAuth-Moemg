@@ -1,0 +1,41 @@
+{
+  "realm": "moemg",
+  "enabled": true,
+  "displayName": "Moemg Identity",
+  "registrationAllowed": false,
+  "loginWithEmailAllowed": true,
+  "duplicateEmailsAllowed": false,
+  "resetPasswordAllowed": true,
+  "rememberMe": true,
+  "verifyEmail": true,
+  "clients": [
+    {
+      "clientId": "game-portal",
+      "name": "自家业务示例：游戏门户",
+      "enabled": true,
+      "protocol": "openid-connect",
+      "publicClient": false,
+      "standardFlowEnabled": true,
+      "directAccessGrantsEnabled": false,
+      "implicitFlowEnabled": false,
+      "serviceAccountsEnabled": false,
+      "redirectUris": ["https://game.example.com/oidc/callback"],
+      "webOrigins": ["https://game.example.com"],
+      "attributes": {"pkce.code.challenge.method": "S256"}
+    },
+    {
+      "clientId": "partner-demo",
+      "name": "第三方应用示例",
+      "enabled": true,
+      "protocol": "openid-connect",
+      "publicClient": false,
+      "standardFlowEnabled": true,
+      "directAccessGrantsEnabled": false,
+      "implicitFlowEnabled": false,
+      "serviceAccountsEnabled": false,
+      "redirectUris": ["https://partner.example.org/oauth/callback"],
+      "webOrigins": ["https://partner.example.org"],
+      "attributes": {"pkce.code.challenge.method": "S256"}
+    }
+  ]
+}

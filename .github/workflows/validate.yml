@@ -1,0 +1,20 @@
+name: Validate configuration
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+jobs:
+  config:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate JSON examples
+        run: python -m json.tool examples/realm-demo.json > /dev/null
+      - name: Check operations scripts
+        run: bash -n scripts/*.sh
+      - name: Validate Compose model
+        env:
+          POSTGRES_PASSWORD: ci-only-not-a-secret
+          KC_BOOTSTRAP_ADMIN_PASSWORD: ci-only-not-a-secret
+          KC_HOSTNAME: https://id.example.com
+        run: docker compose config --quiet
