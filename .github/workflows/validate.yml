@@ -43,3 +43,31 @@ jobs:
       - name: Clean up containers
         if: always()
         run: docker compose down -v
+  oidc_flow:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      POSTGRES_PASSWORD: ci-only-postgres-password
+      KC_BOOTSTRAP_ADMIN_PASSWORD: ci-only-admin-password
+      KC_HOSTNAME: http://127.0.0.1:8080
+    steps:
+      - uses: actions/checkout@v5
+      - name: Install test dependencies
+        run: python -m pip install "requests==2.32.5" "PyJWT[crypto]==2.10.1"
+      - name: Start identity service
+        run: docker compose up -d
+      - name: Wait for Keycloak
+        run: |
+          for attempt in $(seq 1 90); do
+            if curl --silent --fail --max-time 5 http://127.0.0.1:8080/realms/master/.well-known/openid-configuration > /dev/null; then
+              exit 0
+            fi
+            sleep 3
+          done
+          docker compose logs keycloak postgres
+          exit 1
+      - name: Exercise authorization code and PKCE
+        run: python tests/oidc_flow.py
+      - name: Clean up containers
+        if: always()
+        run: docker compose down -v
