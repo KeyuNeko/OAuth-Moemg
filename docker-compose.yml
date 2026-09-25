@@ -1,7 +1,7 @@
 name: moemg-identity
 services:
   postgres:
-    image: postgres:17.4-alpine
+    image: postgres:17.11-alpine
     restart: unless-stopped
     environment:
       POSTGRES_DB: ${POSTGRES_DB:-keycloak}
@@ -17,7 +17,7 @@ services:
     networks: [identity]
 
   keycloak:
-    image: quay.io/keycloak/keycloak:26.2.5
+    image: quay.io/keycloak/keycloak:26.7.4
     command: ["start"]
     restart: unless-stopped
     depends_on:

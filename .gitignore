@@ -3,3 +3,6 @@
 *.sql.gz
 *.log
 backups/
+__pycache__/
+*.pyc
+tests/certs/
