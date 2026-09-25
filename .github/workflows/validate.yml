@@ -7,7 +7,7 @@ jobs:
   config:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Validate JSON examples
         run: python -m json.tool examples/realm-demo.json > /dev/null
       - name: Check operations scripts
@@ -26,7 +26,7 @@ jobs:
       KC_BOOTSTRAP_ADMIN_PASSWORD: ci-only-admin-password
       KC_HOSTNAME: https://id.example.com
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Start identity service
         run: docker compose up -d
       - name: Verify OIDC discovery and issuer

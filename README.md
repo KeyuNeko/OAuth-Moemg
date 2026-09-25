@@ -39,7 +39,7 @@ curl -fsS https://id.example.com/realms/moemg/.well-known/openid-configuration
 
 本仓库不自动创建生产 Realm 或带固定密码的客户端。首次访问 `https://id.example.com/admin/`，使用 `.env` 的引导管理员账号登录，按下方步骤建立正式 Realm 和应用。Keycloak 引导管理员只用于初始管理；创建具 MFA 的日常管理账户后，禁用或更换引导管理员密码。
 
-当前工作区尚未执行容器启动、HTTPS 回调或备份恢复端到端验证：运行环境没有 Docker CLI 和 Linux 服务器。仓库 CI 会在 GitHub Actions 中校验 Compose 配置模型和示例 JSON；合并前应在 Linux 预发布机实际走通首次启动、OIDC 登录、邮箱验证、更新和回滚演练。
+GitHub Actions 已在 Linux Runner 上启动 Compose 容器并验证 Keycloak OIDC 发现文档的 issuer，同时校验配置、示例 JSON 和脚本语法。真实域名的 HTTPS 回调、账号注册登录、邮箱验证、更新及数据库恢复尚未在目标服务器端到端验证；上线前应在预发布机走通这些流程。
 
 ## 初始化和生产加固
 
