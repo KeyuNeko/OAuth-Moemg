@@ -70,6 +70,9 @@ def main():
         f"/admin/realms/{REALM}/users",
         {
             "username": USERNAME,
+            "email": "ci-user@example.test",
+            "firstName": "CI",
+            "lastName": "User",
             "enabled": True,
             "emailVerified": True,
             "credentials": [{"type": "password", "value": PASSWORD, "temporary": False}],
