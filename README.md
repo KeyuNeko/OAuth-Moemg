@@ -2,9 +2,11 @@
 
 基于 Keycloak 与 PostgreSQL 的统一登录中心。Keycloak 提供 OAuth 2.0 / OpenID Connect 标准端点，OIDC 授权码流程支持 PKCE；业务应用只接收标准 OIDC 登录结果，不共享密码。账号目录、MFA、会话、客户端凭据由成熟 IdP 管理。
 
+目标身份平台的信任域、协议、客户端治理、数据模型、HA/DR 与分阶段生产验收见 [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)。本文档描述目标方案；当前仓库仍是 Keycloak/PostgreSQL 部署基线。
+
 ## 架构与固定版本
 
-- Keycloak `26.2.5`、PostgreSQL `17.4-alpine` 是当前可复现基线，Compose 中固定版本标签；这不代表它们在当前部署日期仍是最新或受支持补丁。每次发布前维护者必须核对 Keycloak/PostgreSQL 官方安全公告和支持周期，更新到受支持补丁版本并在预发布环境验证迁移。
+- Keycloak `26.7.4`、PostgreSQL `17.11-alpine` 是当前可复现基线，Compose 中固定版本标签；这不代表它们在当前部署日期仍是最新或受支持补丁。每次发布前维护者必须核对 Keycloak/PostgreSQL 官方安全公告和支持周期，更新到受支持补丁版本并在预发布环境验证迁移。
 - PostgreSQL 只在 Compose 私有网络中开放；Keycloak 仅绑定宿主机回环地址 `127.0.0.1:8080`。
 - 外部 TLS 在 Nginx/宝塔终止。Keycloak 的 issuer 固定为公开 HTTPS 域名，代理头模式为 `xforwarded`。
 - 数据只存于 Docker 命名卷 `postgres_data`。升级前备份数据库；不要删除卷来“修复”问题。

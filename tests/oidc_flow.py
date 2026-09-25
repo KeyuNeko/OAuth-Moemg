@@ -131,16 +131,26 @@ def main():
             def __init__(self):
                 super().__init__()
                 self.parts = []
+                self.hidden_depth = 0
+
+            def handle_starttag(self, tag, attrs):
+                if tag in ("script", "style"):
+                    self.hidden_depth += 1
+
+            def handle_endtag(self, tag):
+                if tag in ("script", "style") and self.hidden_depth:
+                    self.hidden_depth -= 1
 
             def handle_data(self, data):
-                if data.strip():
+                if not self.hidden_depth and data.strip():
                     self.parts.append(data.strip())
 
         visible = VisibleText()
         visible.feed(response.text)
         raise AssertionError(
             f"Login failed: {response.status_code}, path={urlparse(response.url).path}, "
-            f"message={' '.join(visible.parts)[:500]}"
+            f"action_host={urlparse(form.action).netloc}, cookies={len(session.cookies)}, "
+            f"message={' '.join(visible.parts)[-1000:]}"
         )
     location = response.headers["Location"]
     assert location.startswith(REDIRECT + "?"), f"Unexpected redirect: {location}"
