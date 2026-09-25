@@ -14,7 +14,7 @@
 要求 Linux x86_64/arm64、Docker Engine 和 Docker Compose v2 插件。先在 DNS 添加 `id.example.com` 指向服务器，并在宝塔添加站点和签发 HTTPS 证书。
 
 ```sh
-git clone https://github.com/YOUR_ORG/OAuth-Moemg.git
+git clone https://github.com/KeyuNeko/OAuth-Moemg.git
 cd OAuth-Moemg
 cp .env.example .env
 openssl rand -hex 32

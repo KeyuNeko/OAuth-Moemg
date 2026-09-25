@@ -16,6 +16,7 @@ if [[ -z "$latest" ]]; then
   exit 0
 fi
 
+git fetch --quiet origin "refs/tags/$latest:refs/tags/$latest"
 current="$(git describe --tags --exact-match 2>/dev/null || true)"
 if [[ -z "$current" ]]; then
   current="$(git rev-parse --short HEAD)"
@@ -25,6 +26,8 @@ echo "当前版本：$current"
 echo "最新发布：$latest"
 if [[ "$current" == "$latest" ]]; then
   echo "已是最新版本。"
+elif git merge-base --is-ancestor "$latest" HEAD; then
+  echo "当前检出提交已经包含最新发布标签（开发分支），无需更新。"
 else
   echo "可更新。请在宝塔计划任务中点击执行 bash scripts/update.sh。"
 fi
