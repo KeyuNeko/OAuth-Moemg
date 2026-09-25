@@ -10,7 +10,7 @@ from urllib.parse import parse_qs, urlencode, urljoin, urlparse
 import jwt
 import requests
 
-BASE = os.environ.get("OIDC_TEST_BASE", "http://127.0.0.1:8080").rstrip("/")
+BASE = os.environ.get("OIDC_TEST_BASE", "https://localhost:8443").rstrip("/")
 ADMIN_PASSWORD = os.environ["KC_BOOTSTRAP_ADMIN_PASSWORD"]
 REALM = "ci-smoke"
 CLIENT_ID = "ci-pkce-client"
@@ -51,6 +51,7 @@ def post_json(session, path, payload, token):
 
 def main():
     session = requests.Session()
+    session.verify = os.environ.get("OIDC_TEST_CA", "tests/certs/server.crt")
     admin_response = session.post(
         BASE + "/realms/master/protocol/openid-connect/token",
         data={
@@ -171,7 +172,11 @@ def main():
     )
     token_response.raise_for_status()
     tokens = token_response.json()
-    key = jwt.PyJWKClient(discovery["jwks_uri"]).get_signing_key_from_jwt(tokens["id_token"]).key
+    jwks_response = session.get(discovery["jwks_uri"], timeout=15)
+    jwks_response.raise_for_status()
+    kid = jwt.get_unverified_header(tokens["id_token"])["kid"]
+    jwk = next(key for key in jwks_response.json()["keys"] if key["kid"] == kid)
+    key = jwt.PyJWK.from_dict(jwk).key
     claims = jwt.decode(
         tokens["id_token"],
         key,
