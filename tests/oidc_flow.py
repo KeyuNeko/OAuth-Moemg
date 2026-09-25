@@ -126,7 +126,22 @@ def main():
         allow_redirects=False,
         timeout=15,
     )
-    assert response.status_code in (302, 303), f"Login failed: {response.status_code}"
+    if response.status_code not in (302, 303):
+        class VisibleText(HTMLParser):
+            def __init__(self):
+                super().__init__()
+                self.parts = []
+
+            def handle_data(self, data):
+                if data.strip():
+                    self.parts.append(data.strip())
+
+        visible = VisibleText()
+        visible.feed(response.text)
+        raise AssertionError(
+            f"Login failed: {response.status_code}, path={urlparse(response.url).path}, "
+            f"message={' '.join(visible.parts)[:500]}"
+        )
     location = response.headers["Location"]
     assert location.startswith(REDIRECT + "?"), f"Unexpected redirect: {location}"
     params = parse_qs(urlparse(location).query)
@@ -167,4 +182,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
