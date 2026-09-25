@@ -18,3 +18,28 @@ jobs:
           KC_BOOTSTRAP_ADMIN_PASSWORD: ci-only-not-a-secret
           KC_HOSTNAME: https://id.example.com
         run: docker compose config --quiet
+  startup:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      POSTGRES_PASSWORD: ci-only-postgres-password
+      KC_BOOTSTRAP_ADMIN_PASSWORD: ci-only-admin-password
+      KC_HOSTNAME: https://id.example.com
+    steps:
+      - uses: actions/checkout@v4
+      - name: Start identity service
+        run: docker compose up -d
+      - name: Verify OIDC discovery and issuer
+        run: |
+          for attempt in $(seq 1 90); do
+            if curl --silent --show-error --fail --max-time 5 http://127.0.0.1:8080/realms/master/.well-known/openid-configuration > discovery.json; then
+              python -c 'import json; data=json.load(open("discovery.json")); assert data["issuer"] == "https://id.example.com/realms/master"'
+              exit 0
+            fi
+            sleep 3
+          done
+          docker compose logs keycloak postgres
+          exit 1
+      - name: Clean up containers
+        if: always()
+        run: docker compose down -v
